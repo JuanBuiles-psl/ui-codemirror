@@ -5,12 +5,14 @@
  */
 angular.module('ui.codemirror', [])
   .constant('uiCodemirrorConfig', {})
-  .directive('uiCodemirror', uiCodemirrorDirective);
+  .directive('uiCodemirror', ["$timeout", "uiCodemirrorConfig", uiCodemirrorDirective]);
 
 /**
  * @ngInject
  */
 function uiCodemirrorDirective($timeout, uiCodemirrorConfig) {
+
+  var CodeMirror = require('codemirror');
 
   return {
     restrict: 'EA',
@@ -18,7 +20,7 @@ function uiCodemirrorDirective($timeout, uiCodemirrorConfig) {
     compile: function compile() {
 
       // Require CodeMirror
-      if (angular.isUndefined(window.CodeMirror)) {
+      if (angular.isUndefined(CodeMirror)) {
         throw new Error('ui-codemirror needs CodeMirror to work... (o rly?)');
       }
 
@@ -68,10 +70,10 @@ function uiCodemirrorDirective($timeout, uiCodemirrorConfig) {
 
     if (iElement[0].tagName === 'TEXTAREA') {
       // Might bug but still ...
-      codemirrot = window.CodeMirror.fromTextArea(iElement[0], codemirrorOptions);
+      codemirrot = CodeMirror.fromTextArea(iElement[0], codemirrorOptions);
     } else {
       iElement.html('');
-      codemirrot = new window.CodeMirror(function(cm_el) {
+      codemirrot = new CodeMirror(function(cm_el) {
         iElement.append(cm_el);
       }, codemirrorOptions);
     }
@@ -82,7 +84,7 @@ function uiCodemirrorDirective($timeout, uiCodemirrorConfig) {
   function configOptionsWatcher(codemirrot, uiCodemirrorAttr, scope) {
     if (!uiCodemirrorAttr) { return; }
 
-    var codemirrorDefaultsKeys = Object.keys(window.CodeMirror.defaults);
+    var codemirrorDefaultsKeys = Object.keys(CodeMirror.defaults);
     scope.$watch(uiCodemirrorAttr, updateOptions, true);
     function updateOptions(newValues, oldValue) {
       if (!angular.isObject(newValues)) { return; }
